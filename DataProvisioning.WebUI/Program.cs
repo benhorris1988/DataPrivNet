@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using DataProvisioning.Infrastructure.Data;
 
@@ -18,12 +20,22 @@ builder.Services.AddScoped<DataProvisioning.Application.Interfaces.IDatasetDetai
 builder.Services.AddScoped<DataProvisioning.Application.Interfaces.IAccessRequestService, DataProvisioning.Application.Services.AccessRequestService>();
 builder.Services.AddScoped<DataProvisioning.Application.Interfaces.IAdministrationService, DataProvisioning.Application.Services.AdministrationService>();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Login";
-        options.AccessDeniedPath = "/Login/AccessDenied";
-    });
+var testMode = builder.Configuration.GetValue<bool>("TestMode");
+
+if (testMode)
+{
+    builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/Login";
+            options.AccessDeniedPath = "/Login/AccessDenied";
+        });
+}
+else
+{
+    builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+        .AddNegotiate();
+}
 
 builder.Services.AddControllersWithViews();
 
@@ -41,6 +53,9 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthentication();
+
+app.UseMiddleware<DataProvisioning.WebUI.Middlewares.UserProvisioningMiddleware>();
+
 app.UseAuthorization();
 
 app.UseStaticFiles();

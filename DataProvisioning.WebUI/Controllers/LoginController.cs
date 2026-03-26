@@ -12,15 +12,22 @@ namespace DataProvisioning.WebUI.Controllers;
 public class LoginController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly bool _testMode;
 
-    public LoginController(ApplicationDbContext context)
+    public LoginController(ApplicationDbContext context, Microsoft.Extensions.Configuration.IConfiguration configuration)
     {
         _context = context;
+        _testMode = configuration.GetValue<bool>("TestMode");
     }
 
     [HttpGet]
     public async Task<IActionResult> Index(string returnUrl = "/")
     {
+        if (!_testMode)
+        {
+            return RedirectToAction("Index", "Catalog");
+        }
+
         ViewData["ReturnUrl"] = returnUrl;
         
         // For convenience during local dev, list all available users
@@ -32,6 +39,11 @@ public class LoginController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Authenticate(string email, string returnUrl = "/")
     {
+        if (!_testMode)
+        {
+            return RedirectToAction("Index", "Catalog");
+        }
+
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
         if (user == null)
@@ -70,7 +82,10 @@ public class LoginController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        if (_testMode)
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
         return RedirectToAction("Index", "Login");
     }
 }

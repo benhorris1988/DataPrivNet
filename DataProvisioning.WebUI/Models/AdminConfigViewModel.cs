@@ -4,6 +4,8 @@ namespace DataProvisioning.WebUI.Models;
 
 public class AdminConfigViewModel
 {
+    public string ExecutingAccount { get; set; } = string.Empty;
+
     // App Database
     [Required]
     [Display(Name = "Server Host")]
@@ -13,9 +15,11 @@ public class AdminConfigViewModel
     [Display(Name = "Database Name")]
     public string DbName { get; set; } = string.Empty;
 
-    [Required]
+    [Display(Name = "Use Windows Authentication")]
+    public bool DbUseWindowsAuth { get; set; }
+
     [Display(Name = "Username")]
-    public string DbUser { get; set; } = string.Empty;
+    public string? DbUser { get; set; }
 
     [Display(Name = "Password")]
     public string? DbPass { get; set; }
@@ -29,9 +33,11 @@ public class AdminConfigViewModel
     [Display(Name = "Database Name")]
     public string DwName { get; set; } = string.Empty;
 
-    [Required]
+    [Display(Name = "Use Windows Authentication")]
+    public bool DwUseWindowsAuth { get; set; }
+
     [Display(Name = "Username")]
-    public string DwUser { get; set; } = string.Empty;
+    public string? DwUser { get; set; }
 
     [Display(Name = "Password")]
     public string? DwPass { get; set; }

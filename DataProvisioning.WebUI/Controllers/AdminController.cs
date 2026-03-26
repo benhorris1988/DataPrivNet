@@ -132,18 +132,21 @@ public class AdminController : Controller
     public IActionResult Config()
     {
         var vm = new AdminConfigViewModel();
+        vm.ExecutingAccount = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
         
         // Parse DB
         var defConn = _configuration.GetConnectionString("DefaultConnection") ?? "";
         vm.DbHost = ExtractConnStringValue(defConn, "Server");
         vm.DbName = ExtractConnStringValue(defConn, "Database");
         vm.DbUser = ExtractConnStringValue(defConn, "User Id");
+        vm.DbUseWindowsAuth = defConn.Contains("Trusted_Connection=True", System.StringComparison.OrdinalIgnoreCase) || defConn.Contains("Integrated Security=True", System.StringComparison.OrdinalIgnoreCase);
 
         // Parse DW
         var dwConn = _configuration.GetConnectionString("DataWarehouseConnection") ?? "";
         vm.DwHost = ExtractConnStringValue(dwConn, "Server");
         vm.DwName = ExtractConnStringValue(dwConn, "Database");
         vm.DwUser = ExtractConnStringValue(dwConn, "User Id");
+        vm.DwUseWindowsAuth = dwConn.Contains("Trusted_Connection=True", System.StringComparison.OrdinalIgnoreCase) || dwConn.Contains("Integrated Security=True", System.StringComparison.OrdinalIgnoreCase);
 
         // AD
         vm.AdEnabled = _configuration.GetValue<bool>("ActiveDirectory:Enabled");
@@ -175,26 +178,26 @@ public class AdminController : Controller
         {
             // Build Conn Strings
             string defaultConn = $"Server={model.DbHost};Database={model.DbName};TrustServerCertificate=True;";
-            if (!string.IsNullOrEmpty(model.DbUser))
+            if (model.DbUseWindowsAuth)
+            {
+                defaultConn += "Trusted_Connection=True;";
+            }
+            else if (!string.IsNullOrEmpty(model.DbUser))
             {
                  // Keep old pass if new is empty
                  string pass = string.IsNullOrEmpty(model.DbPass) ? ExtractConnStringValue(_configuration.GetConnectionString("DefaultConnection")??"", "Password") : model.DbPass;
                  defaultConn += $"User Id={model.DbUser};Password={pass};";
             }
-            else
-            {
-                defaultConn += "Trusted_Connection=True;";
-            }
 
             string dwConn = $"Server={model.DwHost};Database={model.DwName};TrustServerCertificate=True;";
-            if (!string.IsNullOrEmpty(model.DwUser))
+            if (model.DwUseWindowsAuth)
+            {
+                dwConn += "Trusted_Connection=True;";
+            }
+            else if (!string.IsNullOrEmpty(model.DwUser))
             {
                  string pass = string.IsNullOrEmpty(model.DwPass) ? ExtractConnStringValue(_configuration.GetConnectionString("DataWarehouseConnection")??"", "Password") : model.DwPass;
                  dwConn += $"User Id={model.DwUser};Password={pass};";
-            }
-            else
-            {
-                dwConn += "Trusted_Connection=True;";
             }
 
             if (jsonNode["ConnectionStrings"] == null) jsonNode["ConnectionStrings"] = new JsonObject();

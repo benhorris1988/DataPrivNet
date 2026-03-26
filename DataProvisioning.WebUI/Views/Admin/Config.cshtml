@@ -24,7 +24,13 @@
             
             <!-- Database Settings (App DB) -->
             <div class="card glass-panel mb-4 animate-fade-in" style="animation-delay: 0.1s; margin-bottom: 1.5rem;">
-                <h3 class="mb-3" style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">Database Connection (App)</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                    <h3 style="margin: 0;">Database Connection (App)</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input asp-for="DbUseWindowsAuth" type="checkbox" style="width: 1.2rem; height: 1.2rem; cursor: pointer;" onchange="document.getElementById('dbCredentials').style.opacity = this.checked ? '0.5' : '1'; Array.from(document.getElementById('dbCredentials').querySelectorAll('input')).forEach(i => i.disabled = this.checked);">
+                        <label asp-for="DbUseWindowsAuth" style="margin: 0; cursor: pointer;">Use Windows Auth</label>
+                    </div>
+                </div>
                 
                 <div class="form-group">
                     <label asp-for="DbHost" class="form-label"></label>
@@ -38,22 +44,28 @@
                     <span asp-validation-for="DbName" class="text-danger"></span>
                 </div>
 
-                <div style="display: flex; gap: 1rem;">
+                <div id="dbCredentials" style="display: flex; gap: 1rem; opacity: @(Model.DbUseWindowsAuth ? "0.5" : "1");">
                     <div class="form-group" style="flex: 1;">
                         <label asp-for="DbUser" class="form-label"></label>
-                        <input asp-for="DbUser" class="form-control" required />
+                        <input asp-for="DbUser" class="form-control" disabled="@(Model.DbUseWindowsAuth)" />
                         <span asp-validation-for="DbUser" class="text-danger"></span>
                     </div>
                     <div class="form-group" style="flex: 1;">
                         <label asp-for="DbPass" class="form-label"></label>
-                        <input asp-for="DbPass" type="password" class="form-control" placeholder="Leave blank to keep current" />
+                        <input asp-for="DbPass" type="password" class="form-control" placeholder="Leave blank to keep current" disabled="@(Model.DbUseWindowsAuth)" />
                     </div>
                 </div>
             </div>
 
             <!-- Data Warehouse Settings -->
             <div class="card glass-panel mb-4 animate-fade-in" style="animation-delay: 0.15s; margin-bottom: 1.5rem;">
-                <h3 class="mb-3" style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">Data Warehouse (Scanning Target)</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                    <h3 style="margin: 0;">Data Warehouse (Scanning Target)</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input asp-for="DwUseWindowsAuth" type="checkbox" style="width: 1.2rem; height: 1.2rem; cursor: pointer;" onchange="document.getElementById('dwCredentials').style.opacity = this.checked ? '0.5' : '1'; Array.from(document.getElementById('dwCredentials').querySelectorAll('input')).forEach(i => i.disabled = this.checked);">
+                        <label asp-for="DwUseWindowsAuth" style="margin: 0; cursor: pointer;">Use Windows Auth</label>
+                    </div>
+                </div>
                 
                 <div class="form-group">
                     <label asp-for="DwHost" class="form-label"></label>
@@ -67,15 +79,15 @@
                     <span asp-validation-for="DwName" class="text-danger"></span>
                 </div>
 
-                <div style="display: flex; gap: 1rem;">
+                <div id="dwCredentials" style="display: flex; gap: 1rem; opacity: @(Model.DwUseWindowsAuth ? "0.5" : "1");">
                     <div class="form-group" style="flex: 1;">
                         <label asp-for="DwUser" class="form-label"></label>
-                        <input asp-for="DwUser" class="form-control" required />
+                        <input asp-for="DwUser" class="form-control" disabled="@(Model.DwUseWindowsAuth)" />
                         <span asp-validation-for="DwUser" class="text-danger"></span>
                     </div>
                     <div class="form-group" style="flex: 1;">
                         <label asp-for="DwPass" class="form-label"></label>
-                        <input asp-for="DwPass" type="password" class="form-control" placeholder="Leave blank to keep current" />
+                        <input asp-for="DwPass" type="password" class="form-control" placeholder="Leave blank to keep current" disabled="@(Model.DwUseWindowsAuth)" />
                     </div>
                 </div>
             </div>
@@ -138,6 +150,9 @@
     <div class="col-md-4" style="flex: 0 0 33.333333%; max-width: 33.333333%; padding-right: 15px; padding-left: 15px;">
         <div class="card glass-panel animate-fade-in" style="animation-delay: 0.4s;">
             <h3 style="margin-bottom: 1rem;">System Info</h3>
+            <p><strong>Service Account:</strong><br />
+                <span style="color: var(--accent-info);">@Model.ExecutingAccount</span>
+            </p>
             <p><strong>.NET Framework:</strong>
                 .NET 8.0
             </p>

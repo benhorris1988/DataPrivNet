@@ -24,6 +24,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<AssetPolicyGroup> AssetPolicyGroups { get; set; } = null!;
     public DbSet<AssetPolicyCondition> AssetPolicyConditions { get; set; } = null!;
     public DbSet<AssetPolicyColumn> AssetPolicyColumns { get; set; } = null!;
+    public DbSet<InitialAdmin> InitialAdmins { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -42,6 +43,13 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Role).HasColumnName("role").HasConversion(roleConverter);
             entity.Property(e => e.Avatar).HasColumnName("avatar");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+        });
+
+        modelBuilder.Entity<InitialAdmin>(entity =>
+        {
+            entity.ToTable("initial_admins");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Username).HasColumnName("username").IsRequired().HasMaxLength(255);
         });
 
         modelBuilder.Entity<VirtualGroup>(entity =>

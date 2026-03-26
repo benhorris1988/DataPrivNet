@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
+    var isTestMode = Configuration.GetValue<bool>("TestMode");
+}
 <body>
     <nav class="navbar glass-panel">
         <a asp-controller="Home" asp-action="Index" class="nav-brand">
@@ -41,7 +45,10 @@
             <form method="post" asp-controller="Login" asp-action="Logout" id="logoutForm" style="margin: 0;">
                 <select name="user_action" onchange="if(this.value === 'logout') document.getElementById('logoutForm').submit()" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">
                     <option selected>@User.Identity?.Name (@(User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value))</option>
-                    <option value="logout">Log Out</option>
+                    @if (isTestMode)
+                    {
+                        <option value="logout">Log Out</option>
+                    }
                 </select>
             </form>
         </div>

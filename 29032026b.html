@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root {
+            --azure: #0078d4;
+            --memory: #ff00ad;
+            --ops: #27ae60;
+            --logic: #68217a;
+            --foundry: #1a1a1a;
+            --gold: #d4af37;
+            --bg: #f0f2f5;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: #323130; padding: 20px; line-height: 1.5; }
+        .container { max-width: 1450px; margin: 0 auto; }
+        
+        header { 
+            background: var(--foundry); color: white; padding: 30px; border-radius: 15px; 
+            text-align: center; border: 2px solid var(--gold); margin-bottom: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        header h1 { font-size: 28px; color: var(--gold); margin-bottom: 5px; }
+
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+        .col-label { text-align: center; font-weight: 800; font-size: 12px; text-transform: uppercase; color: #6e7781; margin-bottom: 15px; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 8px solid #ccc; margin-bottom: 25px; }
+        .card-header { padding: 15px 20px; font-weight: 700; border-bottom: 1px solid #eee; background: #fafafa; font-size: 15px; }
+        .card-body { padding: 20px; }
+
+        .mission-stmt { font-size: 12px; color: #555; font-style: italic; margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-left: 3px solid var(--gold); }
+        
+        .role-entry { margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
+        .role-entry:last-child { border-bottom: none; }
+        .role-title { font-weight: 700; font-size: 13px; color: #111; display: block; }
+        .role-count { float: right; color: var(--azure); font-weight: 800; font-size: 11px; }
+        .role-detail { font-size: 12px; color: #444; margin-top: 4px; display: block; }
+
+        .tech-stack { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #eee; border: 1px solid #ddd; color: #555; }
+
+        /* Hover-over Acronym Styling */
+        .tooltip { position: relative; cursor: help; }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 11px;
+            font-weight: 400;
+            line-height: 1.3;
+            pointer-events: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+
+        .theme-foundation { border-top-color: var(--azure); }
+        .theme-memory { border-top-color: var(--memory); }
+        .theme-orchestration { border-top-color: var(--logic); }
+        .theme-ops { border-top-color: var(--ops); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>DATA & INTELLIGENCE ENGINE V6</h1>
+        <p>A Dedicated AI Ops Platform Model | ~40 <span class="tooltip">FTE<span class="tooltiptext">Full-Time Equivalent: Represents the workload of one full-time employee.</span></span> Total</p>
+    </header>
+
+    <div class="grid">
+        <div class="column">
+            <div class="col-label">Level 1: Foundation & Semantic Bedrock</div>
+            <div class="card theme-foundation">
+                <div class="card-header">Data Lakehouse & Knowledge Strategy</div>
+                <div class="card-body">
+                    <div class="mission-stmt">"Ensuring clean, organised facts are ready for autonomous intelligence."</div>
+                    
+                    <div class="role-entry">
+                        <span class="role-title">Core Data Engineers <span class="role-count">10 <span class="tooltip">FTE<span class="tooltiptext">Full-Time Equivalent.</span></span></span></span>
+                        <span class="role-detail">Migrating legacy <span class="tooltip">SQL<span class="tooltiptext">Structured Query Language: Language for database management.</span></span> to Fabric OneLake. They manage the Medallion architecture to provide 'Gold' data for agents.</span>
+                        <div class="tech-stack">
+                            <span class="tag">Fabric</span><span class="tag">OneLake</span><span class="tag"><span class="tooltip">ADF<span class="tooltiptext">Azure Data Factory: A cloud-based data integration service.</span></span></span>
+                        </div>
+                    </div>
+
+                    <div class="role-entry">
+                        <span class="role-title">Semantic Ontology Designers <span class="role-count">2 <span class="tooltip">FTE<span class="tooltiptext">Full-Time Equivalent.</span></span></span></span>
+                        <span class="role-detail">Mapping business logic to Knowledge Graphs. They prevent fact-collisions by ensuring all agents use identical data definitions.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card theme-ops">
+                <div class="card-header">AI FinOps</div>
+                <div class="card-body">
+                    <div class="mission-stmt">"Maintaining safety and predictability at the lowest possible cost."</div>
+                    <div class="role-entry">
+                        <span class="role-title">AI FinOps Engineers <span class="role-count">2 <span class="tooltip">FTE<span class="tooltiptext">Full-Time Equivalent.</span></span></span></span>
+                        <span class="role-detail">Managing <span class="tooltip">GPU<span class="tooltiptext">Graphics Processing Unit: Hardware specialised for AI computation.</span></span> quotas and token circuit breakers to control enterprise spend.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="col-label">Level 2: The Cognitive Nervous System</div>
+            <div class="card theme-memory">
+                <div class="card-header">State & Global Memory Hub</div>
+                <div class="card-body">
+                    <div class="mission-stmt">"Managing active session context and long-term historical memory."</div>
+                    
+                    <div class="role-entry">
+                        <span class="role-title">Operational State Engineers <span class="role-count">2 <span class="tooltip">FTE<span class="tooltiptext">Full-Time Equivalent.</span></span></span></span>
+                        <span class="role-detail">Managing live <span class="tooltip">CRUD<span class="tooltiptext">Create, Read, Update, Delete: The four basic functions of persistent storage.</span></span> operations and live queries. They handle active agent goals and current 'session' context.</span>
+                        <div class="tech-stack"><span class="tag">SurrealDB</span><span class="tag">Live Queries</span></div>
+                    </div>
+
+                    <div class="role-entry">
+                        <span class="role-title">Episodic Memory Engineers <span class="role-count">2 <span class="tooltip">FTE<span class="tooltiptext">Full-Time Equivalent.</span></span></span></span>
+                        <span class="role-detail">Managing historical event sequences and reasoning traces. They allow agents to learn from past successes and failures over time.</span>
+                        <div class="tech-stack"><span class="tag">SurrealDB</span><span class="tag">Graph Persistence</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card theme-orchestration">
+                <div class="card-header">Agentic Gateway & Coordination</div>
+                <div class="card-body">
+                    <div class="mission-stmt">"Managing agent swarms and universal plugs for company tools."</div>
+                    <div class="role-entry">
+                        <span class="role-title">Multi-Agent Coordinators <span class="role-count">3 <span class="tooltip">FTE<span class="tooltiptext">Full-Time Equivalent.</span></span></span></span>
+                        <span class="role-detail">Implementing task negotiation protocols like <span class="tooltip">CNP<span class="tooltiptext">Contract Net Protocol: A negotiation protocol for multi-agent systems.</span></span> for agent-to-agent task bidding.</span>
+                    </div>
+                    <div class="role-entry">
+                        <span class="role-title">Gateway Architects <span class="role-count">3 <span class="tooltip">FTE<span class="tooltiptext">Full-Time Equivalent.</span></span></span></span>
+                        <span class="role-detail">Designing tool access via <span class="tooltip">MCP<span class="tooltiptext">Model Context Protocol: Standard for connecting AI models to data/tools.</span></span> and routing <span class="tooltip">A2A<span class="tooltiptext">Agent-to-Agent: Direct communication between autonomous systems.</span></span> traffic through Solo.io.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="col-label">Level 3: Solutions Production</div>
+            <div class="card" style="border-top-color: #ff3621;">
+                <div class="card-header">AI Solutions & Productionisation</div>
+                <div class="card-body">
+                    <div class="mission-stmt">"Building reliable AI assistants that solve specific business problems."</div>
+                    <div class="role-entry">
+                        <span class="role-title">Senior AI System Engineers <span class="role-count">12 <span class="tooltip">FTE<span class="tooltiptext">Full-Time Equivalent.</span></span></span></span>
+                        <span class="role-detail">Turning experimental <span class="tooltip">POCs<span class="tooltiptext">Proof of Concept: Preliminary demonstration of an idea.</span></span> into production-grade agents compliant with <span class="tooltip">AOA<span class="tooltiptext">Agentic Oriented Architecture: Design pattern using autonomous agents.</span></span> standards.</span>
+                        <div class="tech-stack">
+                            <span class="tag">AI Foundry</span><span class="tag">Semantic Kernel</span>
+                        </div>
+                    </div>
+                    <div class="role-entry">
+                        <span class="role-title">Search & <span class="tooltip">RAG<span class="tooltiptext">Retrieval-Augmented Generation: Enhancing responses with external data.</span></span> Specialists <span class="role-count">3 <span class="tooltip">FTE<span class="tooltiptext">Full-Time Equivalent.</span></span></span></span>
+                        <span class="role-detail">Optimising vector search so agents can retrieve exact data 'needles' from the Lakehouse 'haystack.'</span>
+                        <div class="tech-stack"><span class="tag">AI Search</span><span class="tag">Vector DB</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1 @@
+dotnet run --no-build 2>&1 &

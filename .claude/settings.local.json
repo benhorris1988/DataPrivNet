@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m 'Merge: keep local README with full SurrealDB migration project docs:*)",
+      "Bash(ls /c/development/DataPrivNet/migration/*.py)",
+      "Bash(git commit -m ':*)",
+      "Bash(curl -s -L http://localhost:5065/Login -c /tmp/cookies.txt -b /tmp/cookies.txt)",
+      "Bash(curl -sk https://localhost:7250/ -c /tmp/cookies.txt -b /tmp/cookies.txt -o /tmp/home.html)",
+      "Read(//tmp/**)"
+    ]
+  }
+}

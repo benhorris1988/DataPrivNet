@@ -6,61 +6,179 @@
     <title>@ViewData["Title"] - Data Provisioning Engine</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @{
-    var isTestMode = Configuration.GetValue<bool>("TestMode");
+    var isTestMode       = Configuration.GetValue<bool>("TestMode");
+    var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+    var currentAction     = ViewContext.RouteData.Values["Action"]?.ToString();
+    var userName = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.GivenName)?.Value
+                   ?? User.Identity?.Name ?? "";
+    var userRole = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
+    var initials = string.IsNullOrWhiteSpace(userName) ? "?" :
+                   string.Concat(userName.Split(' ', System.StringSplitOptions.RemoveEmptyEntries)
+                                         .Take(2).Select(w => w[0])).ToUpper();
 }
 <body>
-    <nav class="navbar glass-panel">
-        <a asp-controller="Home" asp-action="Index" class="nav-brand">
-            <span>Data</span>Provisioning Engine
+<div class="app-shell">
+
+    <!-- ═══════════════════════════════════════════════════════════ SIDEBAR -->
+    <nav class="sidebar">
+
+        <!-- Brand -->
+        <a asp-controller="Home" asp-action="Index" class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                    <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/>
+                </svg>
+            </div>
+            <span class="sidebar-brand-text"><span>Data</span>Provisioning</span>
         </a>
 
-        @{
-            var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
-            var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
-        }
+        <!-- Nav -->
+        <div class="sidebar-nav">
 
-        <ul class="nav-links">
-            <li><a asp-controller="Home" asp-action="Index" class="nav-link @(currentController == "Home" ? "active" : "")">Dashboard</a></li>
-            <li><a asp-controller="Catalog" asp-action="Index" class="nav-link @(currentController == "Catalog" ? "active" : "")">Catalog</a></li>
-            <li><a asp-controller="Requests" asp-action="Index" class="nav-link @(currentController == "Requests" ? "active" : "")">My Requests</a></li>
-            
+            <!-- Core -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-label">Core</div>
+
+                <a asp-controller="Home" asp-action="Index"
+                   class="sidebar-link @(currentController == "Home" ? "active" : "")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                    Dashboard
+                </a>
+
+                <a asp-controller="Catalog" asp-action="Index"
+                   class="sidebar-link @(currentController == "Catalog" ? "active" : "")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    Data Catalog
+                </a>
+
+                <a asp-controller="Requests" asp-action="Index"
+                   class="sidebar-link @(currentController == "Requests" ? "active" : "")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                    </svg>
+                    My Requests
+                </a>
+            </div>
+
+            <!-- Management (IAO / IAA / Admin) -->
             @if (User.IsInRole("IAO") || User.IsInRole("IAA") || User.IsInRole("Admin"))
             {
-                <li><a asp-controller="Manage" asp-action="Index" class="nav-link @(currentController == "Manage" ? "active" : "")">Manage Access</a></li>
-                <li><a asp-controller="Admin" asp-action="Groups" class="nav-link @(currentController == "Admin" && currentAction == "Groups" ? "active" : "")">Virtual Groups</a></li>
+                <div class="sidebar-section">
+                    <div class="sidebar-section-label">Management</div>
+
+                    <a asp-controller="Manage" asp-action="Index"
+                       class="sidebar-link @(currentController == "Manage" ? "active" : "")">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+                        </svg>
+                        Manage Access
+                    </a>
+
+                    <a asp-controller="Admin" asp-action="Groups"
+                       class="sidebar-link @(currentController == "Admin" && currentAction == "Groups" ? "active" : "")">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="4"/>
+                            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                        </svg>
+                        Virtual Groups
+                    </a>
+                </div>
             }
+
+            <!-- Admin only -->
             @if (User.IsInRole("Admin"))
             {
-                <li><a asp-controller="Admin" asp-action="Users" class="nav-link @(currentController == "Admin" && currentAction == "Users" ? "active" : "")">Users</a></li>
-                <li><a asp-controller="Admin" asp-action="Config" class="nav-link @(currentController == "Admin" && currentAction == "Config" ? "active" : "")" style="color: var(--accent-warning);">Admin Centre</a></li>
+                <div class="sidebar-section">
+                    <div class="sidebar-section-label">Admin</div>
+
+                    <a asp-controller="Admin" asp-action="Users"
+                       class="sidebar-link @(currentController == "Admin" && currentAction == "Users" ? "active" : "")">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        Users
+                    </a>
+
+                    <a asp-controller="Admin" asp-action="Config"
+                       class="sidebar-link @(currentController == "Admin" && currentAction == "Config" ? "active" : "")">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+                        </svg>
+                        Admin Centre
+                    </a>
+                </div>
             }
-        </ul>
 
-        <div class="user-selector">
-            <span>Logged in as:</span>
-            <form method="post" asp-controller="Login" asp-action="Logout" id="logoutForm" style="margin: 0;">
-                <select name="user_action" onchange="if(this.value === 'logout') document.getElementById('logoutForm').submit()" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">
-                    <option selected>@User.Identity?.Name (@(User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value))</option>
-                    @if (isTestMode)
-                    {
-                        <option value="logout">Log Out</option>
-                    }
-                </select>
-            </form>
         </div>
+
+        <!-- Footer: user + sign out -->
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar">@initials</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name">@userName</div>
+                    <div class="sidebar-user-role">@userRole</div>
+                </div>
+            </div>
+            @if (isTestMode)
+            {
+                <form method="post" asp-controller="Login" asp-action="Logout" style="margin-top: 0.375rem;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="sidebar-link" style="width: 100%; background: none; border: none; cursor: pointer; font-family: inherit; color: var(--text-sidebar);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Sign Out
+                    </button>
+                </form>
+            }
+        </div>
+
     </nav>
+    <!-- ════════════════════════════════════════════════════════ END SIDEBAR -->
 
-    <div class="container animate-fade-in">
-        @RenderBody()
+    <!-- ══════════════════════════════════════════════════════ MAIN WRAPPER -->
+    <div class="main-wrapper">
+
+        <header class="top-header">
+            <span class="header-title">@(ViewData["Title"] ?? "Data Provisioning Engine")</span>
+            <div class="header-actions">
+                <div class="header-user">
+                    <span>@User.Identity?.Name</span>
+                    <div class="header-avatar">@initials</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container animate-fade-in">
+            @RenderBody()
+        </div>
+
     </div>
+    <!-- ══════════════════════════════════════════════════════ END MAIN WRAPPER -->
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-

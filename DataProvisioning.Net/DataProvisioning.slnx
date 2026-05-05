@@ -1,8 +1,0 @@
-<Solution>
-  <Project Path="DataProvisioning.Application/DataProvisioning.Application.csproj" />
-  <Project Path="DataProvisioning.Domain/DataProvisioning.Domain.csproj" />
-  <Project Path="DataProvisioning.Infrastructure/DataProvisioning.Infrastructure.csproj" />
-  <Project Path="DataProvisioning.IntegrationTests/DataProvisioning.IntegrationTests.csproj" />
-  <Project Path="DataProvisioning.UnitTests/DataProvisioning.UnitTests.csproj" />
-  <Project Path="DataProvisioning.WebUI/DataProvisioning.WebUI.csproj" />
-</Solution>

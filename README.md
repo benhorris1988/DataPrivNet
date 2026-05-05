@@ -81,3 +81,84 @@ The solution implements a strict Clean Architecture pattern divided into four pr
    - Target Application SQL Server connection strings.
    - Target Data Warehouse (Scanning Target) database.
    - Toggle "Use Windows Auth" to use the executing Service Account instead of explicit SQL credentials.
+
+## Deployment Success Criteria
+
+When deploying this application, verify the following to ensure a successful deployment:
+
+### Build & Startup
+- ✅ Solution builds without errors (`dotnet build` succeeds)
+- ✅ Application starts without crashing (`dotnet run` completes initialization)
+- ✅ No unhandled exceptions in application logs
+- ✅ Database migrations complete successfully
+
+### UI & Theme
+- ✅ Application loads at `http://localhost:5065` or `https://localhost:7250`
+- ✅ **White Nucleus theme is visible:**
+  - Light gray background (`#F5F7FA`)
+  - White cards and surfaces (`#FFFFFF`)
+  - Dark navy left sidebar (`#1B2A4A`)
+  - Teal accent colors (`#2E8B8B`)
+  - Modern DM Sans typography
+- ✅ Sidebar navigation is properly rendered with icons and sections
+
+### Functionality
+- ✅ Login/authentication works (Windows Auth or TestMode dropdown)
+- ✅ User is automatically provisioned on first login
+- ✅ Sidebar navigation links are functional and route correctly
+- ✅ Dashboard page loads and displays content
+- ✅ Data Catalog page is accessible
+- ✅ My Requests page loads without errors
+- ✅ Admin pages are accessible for administrators
+- ✅ Role-based access control (RBAC) works correctly
+
+### Responsiveness
+- ✅ UI is responsive on desktop browsers (1920x1080, 1366x768)
+- ✅ Sidebar remains fixed and accessible on all screen sizes
+- ✅ No layout breaking or text overflow issues
+- ✅ All buttons and forms are properly aligned and functional
+
+### Database
+- ✅ SQL Server connection established successfully
+- ✅ All tables created and accessible
+- ✅ User data persists across page refreshes
+- ✅ Database queries execute without timeouts or deadlocks
+
+## Deployment Failure Criteria
+
+**Stop deployment and investigate immediately if any of these occur:**
+
+### Critical Build/Runtime Failures
+- ❌ Build fails with compilation errors
+- ❌ Application crashes on startup or throws unhandled exceptions
+- ❌ Cannot establish connection to SQL Server database
+- ❌ Database migrations fail or roll back
+- ❌ Application port binding fails (port already in use or permission denied)
+
+### UI/Theme Issues
+- ❌ Old dark/black theme appears instead of white Nucleus theme
+- ❌ CSS files fail to load (404 errors in browser console)
+- ❌ Sidebar does not appear or is visually broken
+- ❌ Images, fonts, or icons fail to load
+- ❌ Layout is broken or severely misaligned
+
+### Authentication & Authorization
+- ❌ Login page doesn't load or is inaccessible
+- ❌ Cannot authenticate with valid credentials
+- ❌ User provisioning fails silently
+- ❌ Unauthorized users can access protected pages
+- ❌ Admin users lack required permissions
+
+### Functionality Failures
+- ❌ Navigation links return 404 or 500 errors
+- ❌ Dashboard page crashes or loads indefinitely
+- ❌ Database queries timeout or return errors
+- ❌ Forms cannot be submitted or data is not saved
+- ❌ Critical features are missing or non-functional
+
+### Performance & Stability
+- ❌ Page load times exceed 5 seconds for initial load
+- ❌ Application crashes under normal user load
+- ❌ Memory leaks or high CPU usage detected
+- ❌ Session timeouts occur unexpectedly
+- ❌ Multiple console errors or warnings on each page load

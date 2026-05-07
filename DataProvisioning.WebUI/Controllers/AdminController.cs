@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using DataProvisioning.Application.Interfaces;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataProvisioning.WebUI.Controllers;
 
@@ -133,32 +135,39 @@ public class AdminController : Controller
     {
         var vm = new AdminConfigViewModel();
         vm.ExecutingAccount = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-        
+
+        // Read directly from appsettings.json file to get latest saved values
+        string appSettingsPath = Path.Combine(_env.ContentRootPath, "appsettings.json");
+        var jsonConfig = new ConfigurationBuilder()
+            .SetBasePath(_env.ContentRootPath)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
         // Parse DB
-        var defConn = _configuration.GetConnectionString("DefaultConnection") ?? "";
+        var defConn = jsonConfig.GetConnectionString("DefaultConnection") ?? "";
         vm.DbHost = ExtractConnStringValue(defConn, "Server");
         vm.DbName = ExtractConnStringValue(defConn, "Database");
         vm.DbUser = ExtractConnStringValue(defConn, "User Id");
         vm.DbUseWindowsAuth = defConn.Contains("Trusted_Connection=True", System.StringComparison.OrdinalIgnoreCase) || defConn.Contains("Integrated Security=True", System.StringComparison.OrdinalIgnoreCase);
 
         // Parse DW
-        var dwConn = _configuration.GetConnectionString("DataWarehouseConnection") ?? "";
+        var dwConn = jsonConfig.GetConnectionString("DataWarehouseConnection") ?? "";
         vm.DwHost = ExtractConnStringValue(dwConn, "Server");
         vm.DwName = ExtractConnStringValue(dwConn, "Database");
         vm.DwUser = ExtractConnStringValue(dwConn, "User Id");
         vm.DwUseWindowsAuth = dwConn.Contains("Trusted_Connection=True", System.StringComparison.OrdinalIgnoreCase) || dwConn.Contains("Integrated Security=True", System.StringComparison.OrdinalIgnoreCase);
 
         // AD
-        vm.AdEnabled = _configuration.GetValue<bool>("ActiveDirectory:Enabled");
-        vm.AdDomain = _configuration["ActiveDirectory:Domain"] ?? "";
-        vm.AdServer = _configuration["ActiveDirectory:Server"] ?? "";
-        vm.AdBaseDn = _configuration["ActiveDirectory:BaseDn"] ?? "";
+        vm.AdEnabled = jsonConfig.GetValue<bool>("ActiveDirectory:Enabled");
+        vm.AdDomain = jsonConfig["ActiveDirectory:Domain"] ?? "";
+        vm.AdServer = jsonConfig["ActiveDirectory:Server"] ?? "";
+        vm.AdBaseDn = jsonConfig["ActiveDirectory:BaseDn"] ?? "";
 
         // Entra
-        vm.EntraEnabled = _configuration.GetValue<bool>("AzureAd:Enabled");
-        vm.EntraTenantId = _configuration["AzureAd:TenantId"] ?? "";
-        vm.EntraClientId = _configuration["AzureAd:ClientId"] ?? "";
-        
+        vm.EntraEnabled = jsonConfig.GetValue<bool>("AzureAd:Enabled");
+        vm.EntraTenantId = jsonConfig["AzureAd:TenantId"] ?? "";
+        vm.EntraClientId = jsonConfig["AzureAd:ClientId"] ?? "";
+
         return View(vm);
     }
 
@@ -221,10 +230,47 @@ public class AdminController : Controller
 
             var options = new JsonSerializerOptions { WriteIndented = true };
             await System.IO.File.WriteAllTextAsync(appSettingsPath, jsonNode.ToJsonString(options));
+
+            // Test the new connection strings immediately
+            bool dbConnValid = await TestConnectionAsync(defaultConn);
+            bool dwConnValid = await TestConnectionAsync(dwConn);
+
+            if (dbConnValid && dwConnValid)
+            {
+                TempData["SuccessMessage"] = "✓ Settings saved and verified! Connection strings are working. " +
+                    "For existing data services to pick up new connection strings, restart the application or the data service will use the new strings on next request.";
+            }
+            else
+            {
+                var errors = new List<string>();
+                if (!dbConnValid) errors.Add("Application Database connection failed");
+                if (!dwConnValid) errors.Add("Data Warehouse connection failed");
+                TempData["WarningMessage"] = "⚠ Settings saved to disk, but connection test failed: " + string.Join(", ", errors) +
+                    ". Please verify your connection details.";
+            }
         }
 
-        TempData["SuccessMessage"] = "Settings saved successfully! You may need to restart the application for connection string changes to fully apply.";
         return RedirectToAction(nameof(Config));
+    }
+
+    private async Task<bool> TestConnectionAsync(string connectionString)
+    {
+        try
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<DataProvisioning.Infrastructure.Data.ApplicationDbContext>();
+            optionsBuilder.UseSqlServer(connectionString);
+
+            using (var testContext = new DataProvisioning.Infrastructure.Data.ApplicationDbContext(optionsBuilder.Options))
+            {
+                await testContext.Database.OpenConnectionAsync();
+                await testContext.Database.CloseConnectionAsync();
+                return true;
+            }
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private string ExtractConnStringValue(string connString, string key)

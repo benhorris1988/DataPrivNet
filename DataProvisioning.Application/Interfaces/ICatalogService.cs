@@ -7,4 +7,5 @@ namespace DataProvisioning.Application.Interfaces;
 public interface ICatalogService
 {
     Task<List<DatasetCatalogDto>> GetCatalogAsync(int currentUserId, string? searchQuery = null);
+    Task<string> SyncCatalogAsync();
 }

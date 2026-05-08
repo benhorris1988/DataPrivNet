@@ -24,12 +24,21 @@ public class CatalogController : Controller
         // Extract authenticated user ID from Claims
         int currentUserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
         var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "User";
-        
+
         ViewBag.SearchQuery = q;
         ViewBag.CurrentUserId = currentUserId;
         ViewBag.UserRole = userRole;
 
         var catalog = await _catalogService.GetCatalogAsync(currentUserId, q);
         return View(catalog);
+    }
+
+    [Authorize(Roles = "Admin,IAO")]
+    [HttpPost]
+    public async Task<IActionResult> SyncCatalog()
+    {
+        var result = await _catalogService.SyncCatalogAsync();
+        TempData["SyncMessage"] = result;
+        return RedirectToAction(nameof(Index));
     }
 }

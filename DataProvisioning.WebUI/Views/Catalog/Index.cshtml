@@ -11,9 +11,11 @@
     <div style="display: flex; gap: 1rem;">
         @if (userRole == "Admin" || userRole == "IAO")
         {
-            <a href="#" class="btn btn-secondary" onclick="return confirm('Scan Data Warehouse for new tables?')">
-                &#x21bb; Sync Catalog
-            </a>
+            <form asp-action="SyncCatalog" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-secondary" onclick="return confirm('Scan Data Warehouse for new tables and update metadata? All existing security settings will be preserved.')">
+                    &#x21bb; Sync Catalog
+                </button>
+            </form>
         }
         <form method="get" asp-action="Index" style="width: 300px; display: flex;">
             <input type="text" name="q" id="searchInput" class="form-control" placeholder="Search datasets..."
@@ -21,6 +23,15 @@
         </form>
     </div>
 </div>
+
+@if (TempData["SyncMessage"] != null)
+{
+    var message = (string)TempData["SyncMessage"];
+    var isSuccess = message.StartsWith("✓");
+    <div style="margin-bottom: 2rem; padding: 1rem; border-radius: 8px; @(isSuccess ? "background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50;" : "background: rgba(244, 67, 54, 0.1); border: 1px solid rgba(244, 67, 54, 0.3); color: #f44336;")">
+        @Html.Raw(message)
+    </div>
+}
 
 <div class="glass-panel" style="padding: 0; overflow: hidden;">
     <div style="overflow-x: auto;">

@@ -49,9 +49,9 @@
             <tbody>
                 @foreach (var ds in Model)
                 {
-                    <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.2s;">
+                    <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.2s; cursor: pointer;" onclick="window.location.href='@Url.Action("Details", "Dataset", new { id = ds.Id })';">
                         <td style="padding: 1rem; font-weight: 500;">
-                            <a href="#" style="text-decoration: none; color: var(--text-primary);">
+                            <a asp-controller="Dataset" asp-action="Details" asp-route-id="@ds.Id" style="text-decoration: none; color: var(--text-primary);">
                                 @ds.Name
                             </a>
                         </td>
@@ -97,7 +97,7 @@
                             }
                             @if (canEdit)
                             {
-                                <a href="#" class="btn btn-sm btn-secondary" style="font-size: 0.8rem;">Edit</a>
+                                <a asp-controller="Dataset" asp-action="Edit" asp-route-id="@ds.Id" class="btn btn-sm btn-secondary" style="font-size: 0.8rem;">Edit</a>
                             }
                         </td>
                     </tr>

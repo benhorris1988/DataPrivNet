@@ -41,7 +41,7 @@ public class DatasetController : Controller
         return View(dto);
     }
 
-    [HttpPost("Dataset/Details/{id}")]
+    [HttpPost("Dataset/RequestAccess")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RequestAccess(int id, string justification, int? policy_group_id)
     {
@@ -51,7 +51,7 @@ public class DatasetController : Controller
         {
             DatasetId = id,
             Justification = justification,
-            PolicyGroupId = policy_group_id
+            PolicyGroupId = policy_group_id == 0 ? null : policy_group_id
         };
 
         await _requestService.SubmitRequestAsync(currentUserId, dto);

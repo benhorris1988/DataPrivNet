@@ -68,7 +68,6 @@ public class AdministrationService : IAdministrationService
     {
         IQueryable<VirtualGroup> query = _context.VirtualGroups
             .Include(g => g.Owner)
-            .Include(g => g.Datasets)
             .Include(g => g.Members)
                 .ThenInclude(m => m.User);
 
@@ -79,6 +78,16 @@ public class AdministrationService : IAdministrationService
 
         var groups = await query.OrderBy(g => g.Name).ToListAsync();
 
+        var groupIds = groups.Select(g => g.Id).ToList();
+        var datasetsByGroup = await _context.VirtualGroups
+            .Where(g => groupIds.Contains(g.Id))
+            .SelectMany(g => g.Datasets.Select(d => new { GroupId = g.Id, d.Id, d.Name }))
+            .ToListAsync();
+
+        var datasetLookup = datasetsByGroup
+            .GroupBy(d => d.GroupId)
+            .ToDictionary(g => g.Key, g => g.Select(d => new ControlledDatasetDto { Id = d.Id, Name = d.Name }).OrderBy(d => d.Name).ToList());
+
         return groups.Select(g => new VirtualGroupDto
         {
             Id = g.Id,
@@ -88,7 +97,7 @@ public class AdministrationService : IAdministrationService
             OwnerName = g.Owner?.Name ?? "Unknown",
             IsOwner = g.OwnerId == currentUserId,
             CanEdit = g.OwnerId == currentUserId || role == "Admin",
-            ControlledDatasets = g.Datasets.OrderBy(d => d.Name).Select(d => d.Name).ToList(),
+            ControlledDatasets = datasetLookup.TryGetValue(g.Id, out var datasets) ? datasets : new List<ControlledDatasetDto>(),
             Members = g.Members.Select(m => new GroupMemberDto
             {
                 UserId = m.UserId,
@@ -141,6 +150,17 @@ public class AdministrationService : IAdministrationService
         _context.VirtualGroupMembers.Add(new VirtualGroupMember { GroupId = groupId, UserId = userId });
         await _context.SaveChangesAsync();
         return null;
+    }
+
+    public async Task RemoveGroupMemberAsync(int groupId, int userId)
+    {
+        var member = await _context.VirtualGroupMembers
+            .FirstOrDefaultAsync(m => m.GroupId == groupId && m.UserId == userId);
+        if (member != null)
+        {
+            _context.VirtualGroupMembers.Remove(member);
+            await _context.SaveChangesAsync();
+        }
     }
 
     public async Task<List<UserDto>> GetPossibleOwnersAsync()

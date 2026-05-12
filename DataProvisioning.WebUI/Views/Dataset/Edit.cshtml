@@ -36,8 +36,8 @@
             </div>
 
             <div class="mb-4">
-                <label asp-for="OwnerGroupId" class="form-label fw-bold">Owner Group</label>
-                <p class="text-muted small mb-2">Select the Virtual Group responsible for this dataset.</p>
+                <label asp-for="OwnerGroupId" class="form-label fw-bold">Data Community</label>
+                <p class="text-muted small mb-2">Select the Data Community responsible for this dataset.</p>
                 <select asp-for="OwnerGroupId" class="form-select">
                     <option value="">-- Unassigned --</option>
                     @foreach (var g in Model.AvailableGroups)

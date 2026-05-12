@@ -122,49 +122,6 @@ public class AccessRequestService : IAccessRequestService
             request.ReviewedById = adminId;
             request.ReviewedAt = DateTime.UtcNow;
             request.PolicyGroupId = policyGroupId;
-
-            // --- PROVISIONING TO DATA WAREHOUSE SIMULATION ---
-            // In the original PHP (process_request.php), this executed raw SQL against a separate $pdo_dw connection
-            // to insert into AppAdmin.PermissionsMap. Let's log/simulate it here for the .NET port:
-            // 1. Get conditions from Policy Group
-            var permissions = new List<(string Col, string Val)>();
-
-            if (!policyGroupId.HasValue)
-            {
-                permissions.Add(("Any", "ALL"));
-            }
-            else
-            {
-                var conditions = await _context.AssetPolicyGroups // Assuming we'd add AssetPolicyConditions later if needed
-                    .Where(p => p.Id == policyGroupId.Value)
-                    .ToListAsync();
-                    
-                // (Omitted the complex condition string splitting for brevity of this simulation, 
-                // but the integration point is here)
-            }
-
-            // Provisioning to Data Warehouse securely via EF Core
-            var existingPermissions = await _dwContext.PermissionsMap
-                .Where(p => p.UserID == request.User.Name && p.TableName == request.Dataset.Name)
-                .ToListAsync();
-
-            if (existingPermissions.Any())
-            {
-                _dwContext.PermissionsMap.RemoveRange(existingPermissions);
-            }
-
-            foreach(var p in permissions)
-            {
-                _dwContext.PermissionsMap.Add(new DataProvisioning.Domain.Entities.PermissionMap 
-                { 
-                    UserID = request.User.Name, 
-                    TableName = request.Dataset.Name, 
-                    ColumnID = p.Col, 
-                    AuthorizedValue = p.Val 
-                });
-            }
-            
-            await _dwContext.SaveChangesAsync();
         }
         else if (action == "reject")
         {
@@ -174,6 +131,52 @@ public class AccessRequestService : IAccessRequestService
         }
 
         await _context.SaveChangesAsync();
+
+        if (action == "approve")
+        {
+            try
+            {
+                var permissions = new List<(string Col, string Val)>();
+
+                if (!policyGroupId.HasValue)
+                {
+                    permissions.Add(("Any", "ALL"));
+                }
+                else
+                {
+                    var conditions = await _context.AssetPolicyConditions
+                        .Where(c => c.PolicyGroupId == policyGroupId.Value)
+                        .ToListAsync();
+
+                    foreach (var c in conditions)
+                        permissions.Add((c.ColumnName, c.Value));
+                }
+
+                var existingPermissions = await _dwContext.PermissionsMap
+                    .Where(p => p.UserID == request.User.Name && p.TableName == request.Dataset.Name)
+                    .ToListAsync();
+
+                if (existingPermissions.Any())
+                    _dwContext.PermissionsMap.RemoveRange(existingPermissions);
+
+                foreach (var p in permissions)
+                {
+                    _dwContext.PermissionsMap.Add(new DataProvisioning.Domain.Entities.PermissionMap
+                    {
+                        UserID = request.User.Name,
+                        TableName = request.Dataset.Name,
+                        ColumnID = p.Col,
+                        AuthorizedValue = p.Val
+                    });
+                }
+
+                await _dwContext.SaveChangesAsync();
+            }
+            catch
+            {
+                // DW provisioning failure does not roll back the approval
+            }
+        }
     }
 
     public async Task<ManageAccessViewModel> GetManageAccessDashboardAsync(int userId, string role)

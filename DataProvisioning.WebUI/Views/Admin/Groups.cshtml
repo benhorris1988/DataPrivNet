@@ -1,15 +1,15 @@
 @model IEnumerable<DataProvisioning.Application.DTOs.VirtualGroupDto>
 @{
-    ViewData["Title"] = "Manage Groups";
+    ViewData["Title"] = "Data Communities";
     var possibleOwners = ViewBag.PossibleOwners as List<DataProvisioning.Application.DTOs.UserDto>;
     var allUsers = ViewBag.AllUsers as List<DataProvisioning.Application.DTOs.UserDto>;
 }
 
 <div class="container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1>Virtual Groups</h1>
+        <h1>Data Communities</h1>
         <button onclick="document.getElementById('createGroupModal').style.display='block'" class="btn btn-primary">
-            + Create Group
+            + Create Community
         </button>
     </div>
 
@@ -58,13 +58,13 @@
                         <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.25rem;">
                             @foreach (var ds in g.ControlledDatasets)
                             {
-                                <span class="badge" style="background:rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); font-size: 0.8rem;">@ds</span>
+                                <a href="/Dataset/Details/@ds.Id" style="background:#e8f0fe; color:#1a3a6b; border: 1px solid #c5d5f5; border-radius:4px; padding:2px 8px; font-size:0.8rem; text-decoration:none;">@ds.Name</a>
                             }
                         </div>
                     }
                     else
                     {
-                        <span style="color:var(--text-secondary); font-size:0.85rem; display:block; margin-top:0.25rem;">none</span>
+                        <span style="color:#666; font-size:0.85rem; display:block; margin-top:0.25rem;">none</span>
                     }
                 </div>
 
@@ -74,9 +74,19 @@
                 <ul style="list-style: none; padding: 0; margin-bottom: 1rem;">
                     @foreach (var m in g.Members)
                     {
-                        <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <span>@m.Name</span>
-                            <span style="color: var(--text-secondary); font-size: 0.8rem;">@m.Email</span>
+                            <span style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="color: var(--text-secondary); font-size: 0.8rem;">@m.Email</span>
+                                @if (g.CanEdit)
+                                {
+                                    <form asp-action="RemoveGroupMember" method="post" style="margin: 0;" onsubmit="return confirm('Remove @m.Name from this group?');">
+                                        <input type="hidden" name="groupId" value="@g.Id" />
+                                        <input type="hidden" name="userId" value="@m.UserId" />
+                                        <button type="submit" style="background: none; border: none; color: var(--accent-danger); font-size: 0.75rem; cursor: pointer; text-decoration: underline; padding: 0;">Remove</button>
+                                    </form>
+                                }
+                            </span>
                         </li>
                     }
                     @if (!g.Members.Any())
@@ -116,7 +126,7 @@
 <!-- Create Group Modal -->
 <div id="createGroupModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000;">
     <div class="glass-panel" style="width: 400px; margin: 100px auto; padding: 2rem;">
-        <h2>Create New Group</h2>
+        <h2>Create New Data Community</h2>
         <form asp-action="CreateGroup" method="post">
             <div class="form-group">
                 <label class="form-label">Group Name</label>
@@ -154,7 +164,7 @@
 <!-- Edit Group Modal -->
 <div id="editGroupModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000;">
     <div class="glass-panel" style="width: 400px; margin: 100px auto; padding: 2rem;">
-        <h2>Edit Group</h2>
+        <h2>Edit Data Community</h2>
         <form asp-action="UpdateGroup" method="post">
             <input type="hidden" name="Id" id="edit_group_id">
             <div class="form-group">

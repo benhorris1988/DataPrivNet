@@ -21,8 +21,14 @@ public class VirtualGroupDto
     public bool IsOwner { get; set; }
     public bool CanEdit { get; set; }
     
-    public List<string> ControlledDatasets { get; set; } = new();
+    public List<ControlledDatasetDto> ControlledDatasets { get; set; } = new();
     public List<GroupMemberDto> Members { get; set; } = new();
+}
+
+public class ControlledDatasetDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
 }
 
 public class GroupMemberDto

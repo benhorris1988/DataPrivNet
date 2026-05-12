@@ -128,6 +128,15 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Groups));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveGroupMember(int groupId, int userId)
+    {
+        await _adminService.RemoveGroupMemberAsync(groupId, userId);
+        TempData["SuccessMessage"] = "Member removed successfully.";
+        return RedirectToAction(nameof(Groups));
+    }
+
     // --- Configuration (Admin Centre) ---
     [Authorize(Roles = "Admin")]
     [HttpGet]

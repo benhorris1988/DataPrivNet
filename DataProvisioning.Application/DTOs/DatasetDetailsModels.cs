@@ -16,6 +16,7 @@ public class DatasetDetailsDto
     public List<DatasetRequestDto> UserRequests { get; set; } = new();
     public List<AssetPolicyGroupDto> AvailablePolicies { get; set; } = new();
     public List<DatasetReportDto> LinkedReports { get; set; } = new();
+    public List<DatasetApproverDto> OwnerGroupMembers { get; set; } = new();
     
     // Authorization flags
     public bool HasFullAccess { get; set; }

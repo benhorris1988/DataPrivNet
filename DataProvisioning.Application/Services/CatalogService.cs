@@ -167,6 +167,7 @@ public class CatalogService : ICatalogService
         {
             await connection.OpenAsync();
 
+            var tableNames = new List<string>();
             using (var cmd = connection.CreateCommand())
             {
                 cmd.CommandText = @"
@@ -178,22 +179,21 @@ public class CatalogService : ICatalogService
 
                 using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    var tableNames = new List<string>();
                     while (await reader.ReadAsync())
                     {
                         tableNames.Add(reader.GetString(0));
                     }
-
-                    foreach (var tableName in tableNames)
-                    {
-                        var columns = await GetTableColumnsAsync(connection, tableName);
-                        tables.Add(new TableInfo
-                        {
-                            TableName = tableName,
-                            Columns = columns
-                        });
-                    }
                 }
+            }
+
+            foreach (var tableName in tableNames)
+            {
+                var columns = await GetTableColumnsAsync(connection, tableName);
+                tables.Add(new TableInfo
+                {
+                    TableName = tableName,
+                    Columns = columns
+                });
             }
         }
 

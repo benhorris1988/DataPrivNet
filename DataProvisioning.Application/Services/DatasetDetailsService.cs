@@ -89,6 +89,8 @@ public class DatasetDetailsService : IDatasetDetailsService
             groupApprovers.AddRange(members);
         }
 
+        dto.OwnerGroupMembers = groupApprovers.OrderBy(a => a.RoleType == "Owner" ? 0 : 1).ThenBy(a => a.Name).ToList();
+
         foreach (var req in requests)
         {
             var reqDto = new DatasetRequestDto

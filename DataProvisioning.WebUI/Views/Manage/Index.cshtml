@@ -43,7 +43,7 @@
                                     <span class="badge" style="background: var(--accent-danger); color: white; margin-left: 0.5rem; font-size: 0.7rem;">Table Not Found</span>
                                 }
                                 <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">
-                                    @(ds.Description.Length > 50 ? ds.Description.Substring(0, 50) + "..." : ds.Description)
+                                    @((ds.Description ?? "").Length > 50 ? ds.Description!.Substring(0, 50) + "..." : ds.Description ?? "")
                                 </div>
                             </td>
                             <td style="padding: 1rem;">

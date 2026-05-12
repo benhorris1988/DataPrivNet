@@ -17,6 +17,7 @@ public interface IAdministrationService
     Task CreateGroupAsync(CreateGroupDto dto);
     Task UpdateGroupAsync(int currentUserId, string role, UpdateGroupDto dto);
     Task<string?> AddGroupMemberAsync(int groupId, int userId);
+    Task RemoveGroupMemberAsync(int groupId, int userId);
     
     // Helpers
     Task<List<UserDto>> GetPossibleOwnersAsync();

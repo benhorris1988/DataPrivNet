@@ -176,7 +176,7 @@
                     {
                         <div style="background: rgba(255, 152, 0, 0.1); border-left: 4px solid var(--accent-warning); padding: 1rem; margin-bottom: 1rem;">
                             <strong style="color: var(--accent-warning);">Request Disabled</strong>
-                            <p style="margin: 0.5rem 0 0; font-size: 0.9rem;">This dataset does not have an assigned Owner Group. Please contact an Administrator.</p>
+                            <p style="margin: 0.5rem 0 0; font-size: 0.9rem;">This dataset does not have an assigned Data Community. Please contact an Administrator.</p>
                         </div>
                         <button type="button" class="btn btn-secondary" style="width: 100%; opacity: 0.5; cursor: not-allowed;" disabled>Request Access</button>
                     }
@@ -263,14 +263,22 @@
             </div>
 
             <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                <strong>Owner Group:</strong><br>
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <span>@(Model.GroupName ?? "Unknown")</span>
-                    @if (Model.OwnerGroupId != null)
+                <strong>Data Community:</strong>
+                <div style="margin-top: 0.35rem; margin-bottom: 0.5rem;">@(Model.GroupName ?? "Unknown")</div>
+                @if (Model.OwnerGroupMembers.Any())
+                {
+                    @foreach (var m in Model.OwnerGroupMembers)
                     {
-                        <button style="background: none; border: none; color: var(--accent-primary); cursor: pointer; font-size: 1.2rem;" title="View Group Owner & Members">&#9432;</button>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); padding: 0.15rem 0;">
+                            <span style="color: var(--text-primary);">@m.Name</span>
+                            <span style="opacity: 0.6; margin-left: 0.3rem;">(@m.RoleType)</span>
+                        </div>
                     }
-                </div>
+                }
+                else if (Model.OwnerGroupId != null)
+                {
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">No members assigned</div>
+                }
             </div>
         </div>
     </div>
